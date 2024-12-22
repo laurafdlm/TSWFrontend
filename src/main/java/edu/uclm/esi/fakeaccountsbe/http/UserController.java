@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,15 +33,22 @@ public class UserController {
 	private UserService userService;
 	
 	@PostMapping("/registrar1")
-	public void registrar1(HttpServletRequest req, @RequestBody CredencialesRegistro cr) {
-		cr.comprobar();
-		User user = new User();
-		user.setEmail(cr.getEmail());
-		user.setPwd(cr.getPwd1());
-		
-		this.userService.registrar(req.getRemoteAddr(), user);
+	public ResponseEntity<String> registrar1(HttpServletRequest req, @RequestBody CredencialesRegistro cr) {
+	    try {
+	        cr.comprobar();
+
+	        User user = new User();
+	        user.setEmail(cr.getEmail());
+	        user.setPwd(cr.getPwd1());
+
+	        this.userService.registrar(req.getRemoteAddr(), user);
+
+	        return ResponseEntity.ok("Usuario registrado correctamente");
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error en el registro: " + e.getMessage());
+	    }
 	}
-	
+
 	@GetMapping("/registrar2")
 	public void registrar2(HttpServletRequest req, @RequestParam String email, @RequestParam String pwd1, @RequestParam String pwd2) {
 		CredencialesRegistro cr = new CredencialesRegistro();
